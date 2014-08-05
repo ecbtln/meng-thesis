@@ -80,7 +80,7 @@ Jim Yang, VMware \\
 }
 \doublespacing
 \section{Introduction}
-Historically, virtual machines have owned a staggering majority of the enterprise and devops marketplaces. Virtual machi
+Historically, virtual machines have owned a staggering majority of the enterprise and devops marketplaces. Virtual machi TODOTODO
 Recently, however, a relatively new framework called Docker hopes to redefine the industry. Making use of many recently added extensions to the linux kernel, Docker containers are a lightweight alternative to virtual machines that aim to streamline the developer workflow by creating shippable build environments without the bulk and performance degradation of running within a virtual machine.
 
 Unlike virtual machines, containers share the kernel with the host and other containers running on that same host. For this reason, Docker containers only support linux-based operating systems and workflows, as opposed to the wider range of legacy and Windows-based operating systems that virtual machines promise to support.
@@ -90,6 +90,9 @@ For some, Docker containers may provide a cleaner, higher performing, alternativ
 \section{Docker}
 
 Docker is a platform that enables streamlined and automated building, shipping, and running of applications across a host of different environments. Each container provides a namespaced, isolated environment for execution. Docker exploits filesystem layering, as well as specific features of the linux kernel, to be able to run these environments in a lightweight manner that is faster and less expensive than running inside of a virtual machine.
+
+
+talk about how containers can run one or many processes using something like supervisord.
 
 \begin{figure}[h]
 \centering
@@ -158,8 +161,13 @@ Theoretically, this tool would permit us to create a tarball out of a full-fledg
 
 As a result, Docker recommends that this tool be used only to create base images. In the Docker framework, base images are those images that do not have a parent and instead fully represent an entire OS on their own. Base images are used as starting points from which all other projects can inherit \cite{baseimage}. Base images should be made as small as possible and intuitively should only contain the necessary files to provide a fully-functioning OS. Packages can subsequently be installed on top of the base image depending on the desired function of the container. 
 
+\subsection{Docker2VM}
+Unlike the task of converting VMs to Docker, the converse is extremely straightforward. Since Docker can be run within a VM, one can simply run the same Docker container within a VM to obtain a Docker image that has been "converted" to a VM.
+
 \section{\projectname}
-To this effect, I propose a robust and fully extensible set of evolutionary game theory simulation tools. 
+To this effect, I propose an
+
+ robust and fully extensible set of evolutionary game theory simulation tools. 
 
 \subsection{Filesystem Layering}
 
@@ -183,6 +191,10 @@ In order to take advantage of Docker's layering filesystem, we propose that
 
 \subsubsection{Verification}
 need to make sure all of these undo/redo changes result in the same VM you started with.
+
+TODO: with all of these filesystem transformations, we ran the container verification process to ensure that the resulting docker image, when built, represents a byte-for-byte equivalent filesystem as the original VM. This is essential to ensure correctness, and in all of our tests with various Ubuntu releases, verification was able to verify the results of our undo and redo transformations and exploitation of layering.
+
+
 \subsection{Container Configuration}
 
 On an abstract level, this encompasses a few major ideas:
@@ -278,14 +290,6 @@ The following table shows the reduction in diff sizes for various releases of Ub
 \label{table:diff}
 \end{table}
 
-
-
-
-
-\subsection{Container Verification}
-
-TODO: with all of these filesystem transformations, we ran the container verification process to ensure that the resulting docker image, when built, represents a byte-for-byte equivalent filesystem as the original VM. This is essential to ensure correctness, and in all of our tests with various Ubuntu releases, verification was able to verify the results of our undo and redo transformations and exploitation of layering.
-
 Further experimentation will be done with various releases of other linux distributions such as CentOS, RedHat, Gentoo, BusyBox, Debian, and Fedora.
 
 
@@ -302,15 +306,8 @@ In addition to implementation, the results of the thesis can be evaluated in a n
 \end{itemize}
 
 \section{Further Research}
-TODO:
-In addition to this, depending on if time permits, there are further areas of research to dive into including:
 
-Support for vApps and how they might map to a set of containers
-
-
-Performance analysis of Docker's copy on write and layering mechanism, and how it compares to snapshots in VMs and how they are based on diffs.
-
-Do layers need to be flattened the same way snapshots do? If so when? how can we automate this?
+Depending on if time permits, we would like to explore supporting the conversion of vApp to a set of containers. vApps are a logical set of Virtual Machines that work together to support a specific applications goals. This would likely map to a set of containers, where each container corresponds to a a given virtual machine. Just as the VMs are linked together through perhaps shared volumes and network communication, the containers' could be orchestrated to function in an analogous manner.
 
 
 \begin{thebibliography}{99}
