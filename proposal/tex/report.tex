@@ -80,7 +80,8 @@ Jim Yang, VMware \\
 }
 \doublespacing
 \section{Introduction}
-Historically, virtual machines have owned a staggering majority of the enterprise marketplaces. Recently, a relatively new framework called Docker hopes to redefine the industry. Making use of many extensions to the Linux kernel, Docker containers are a lightweight alternative to virtual machines that aim to streamline the developer workflow by creating shippable build environments without the bulk and performance degradation of running within a virtual machine.
+Historically, virtual machines have owned a staggering majority of the enterprise marketplaces. Recently, a relatively new framework called Docker hopes to redefine the industry. Making use of many extensions to the Linux kernel, Docker containers are a lightweight alternative to virtual machines that may have had their original influences from the web-hosting industry. Many such web hosts have offered shared hosting plans, and containers provide a much stronger form of process-level isolation than originally provided in Linux.
+Furthermore, Docker containers aim to streamline the developer workflow by creating shippable build environments without the bulk and performance degradation of running within a virtual machine.
 
 Unlike virtual machines, containers share the kernel with the host and other containers running on that same host. For this reason, Docker containers only support Linux-based operating systems and workflows, as opposed to the wider range of legacy and Windows-based operating systems that virtual machines promise to support.
 
@@ -142,9 +143,9 @@ By giving up isolation, unlike virtual machines which incur a performance overhe
 \label{fig:test}
 \end{figure}
 
-Since Docker can run directly inside of a virtual machine, but not vice versa, there are interesting ways in which Docker and VMware might be able to work together in the future to offer a streamlined experience that captures the benefits of each. Multiple, trusted, containers running in the same VM, for example, could provide stronger isolation while still achieving the portability and deployment benefits that Docker containers provide.
+Since Docker can run directly inside of a virtual machine, but not vice versa, there are interesting ways in which Docker and VMware VMs might be able to work together in the future to offer a streamlined experience that captures the benefits of each. Multiple, trusted, containers running in the same VM, for example, could provide stronger isolation while still achieving the portability and deployment benefits that Docker containers provide.
 
-Another distinct advantage of VMs is there ability to perform live migrations from one host to another. VMware dubs this process vMotion\cite{vmotion}. Docker containers, unless running in a VM (and migrated with vMotion), cannot be live migrated to another host and instead must be shut down, moved, and started back up. CRIU\cite{CRIU} is a project under heavy active active development that attempts to bring this live migration to the container ecosystem by implementing checkpoint/restore functionality for Linux in userspace.
+Another distinct advantage of VMs is there ability to perform live migrations from one host to another. VMware dubs this process vMotion\cite{vmotion}, and it is used as a direct building block for VMware's Dynamic Resource Scheduling (DRS)\cite{DRS}. Docker containers, unless running in a VM (and migrated with vMotion), cannot be live migrated to another host and instead must be shut down, moved, and started back up. CRIU\cite{CRIU} is a project under heavy active active development that attempts to bring this live migration to the container ecosystem by implementing checkpoint/restore functionality for Linux in userspace. Once completed, CRIU might be used as a primitive for dynamic resource scheduling among different Docker host. However, as of this writing, no such feature exists.
 
 
 \section{Previous Work}
@@ -190,15 +191,19 @@ Once detected, we export the filesystem of the corresponding base image and make
 
 By making use of a diff, we reduce the size of the VM to the size of the tarball representing the diff and automatically make use of Docker's built in filesystem layering capabilities. For an outline of space savings associated with this technique, see section~\ref{sec:results}.
 
-\subsubsection{Package management}
+\subsubsection{Package Management}
 To further reduce the size of the given diff and maximize the amount of layering, \projectname\ will automatically detect the packages that are installed on the base image of the OS, as compared to those on the VM. Before calculating the filesystem diff, we construct a diff of packages that are installed. While each OS's package management tool differs in commands and syntax, on a high level the process is largely similar regardless of underlying OS. Presumably, the diff will consist of mostly packages that are installed on the VM and not the base image, but it is possible others will exist on the base image but not the VM. We make a clone of the VM's filesystem (so as not to modify it in any way), and then we uninstall all packages on the VM but not the base image and install packages on the base image but not the VM. It is essential to preserve any configuration files that have been customized and will not be restored by the corresponding install process.
 
 The goal of this technique is to further coerce the VM filesystem to be as similar to the base image as possible before calculating the diff, thereby reducing its size. During the build process, after applying the diff we can reinstall any packages that had been removed and vice versa, thereby obtaining the original VM filesystem.
 
-TODO: use a directed graph to calculate dependencies and reduce the number of packages listed.
+
+\underline{Dependency Detection}\\
+Many of the packages generated in the diff represent dependencies of other packages that were not directly installed. For example, in the package diff calculated between Ubuntu Server 14.04 and its corresponding base image, we found 202 packages installed on Ubuntu Server. However, only 81 of these, or 40\%, were packages that were not installed as a dependency to some other package in the set. In other words, installing the original 81 packages would have the overall outcome of having all 202 packages installed, because they implicitly depend on the remaining packages. For this reason, we need only list the 81 packages in the Dockerfile, and can rely on the dependency support built in to most modern package management tools to install the rest.
+
+To make this reduction, we generate a directed graph of all the packages that must be installed, where there is a edge from $A$ to $B$ if and only if package $A$ depends on package $B$. Once generated, those packages of interest are all nodes in the graph that have an in degree of 0.
 
 \begin{figure}[h]
-\centering
+\centeringfu
     \includegraphics[width=0.6\textwidth]{dockerfile.png}
     \caption{An example Dockerfile generated by \projectname\ which exploits Docker's built in layering. Undoing the changes applied to the VM in the reverse order, we obtain the original VM's filesystem. First, we inherit from the base image of the corresponding Linux distribution and release. Then, we add the tarball of changes and deletions, which Docker automatically unpacks. We then add the list of deleted files and execute a command to delete all of the files listed. Finally, we install any packages detected on the VM but not the base image, using the provided package management tool.}
 \end{figure}
@@ -209,6 +214,8 @@ Certain files in the VM are either unnecessary, or can be regenerated on the fly
 
 \subsection{Verification}
 With all of these transformations in place, it is essential to verify that the Docker image that is built is identical to the original VM in terms of its filesystem. Theoretically, since we are applying a sequence of transformations on the VM, and then applying the reverse sequence of inverse transformations during the build process, the resulting Docker image should be identical. Nonetheless, we implement this optional method of image verification to ensure correctness. Image inheritance and diff creation and patching is relatively straightforward and well-tested. On the other hand, package uninstallation and installation may not always be exact inverse operations, which might affect correctness of the Docker container. Although package management provides an opportune strategy to cut down on the size of the image diff, it is potentially risky and should be used with caution.
+
+An alternative method of package management could also be explored using a slightly different approach that would bootstrap the diff tool's correctness for package management as well. Instead of uninstall and installing packages on the clone of the VM, we could install and uninstall the same packages, respectively, on the given OS base image within Docker. Once completed, we could calculate the diff between the resulting Docker image and the original VM, so that we are no longer relying on the inverse operations of install/reinstall for correctness. 
 
 \subsection{Container Configuration}
 In addition to converting the filesystem to one that may better exploit layering, another big component of \projectname\ is its ability to automatically configure the resulting containers in a manner similar to that of the original VM.
@@ -307,6 +314,9 @@ In addition to implementation, the results of the thesis can be evaluated in a n
 \label{sec:futureresearch}
 If time permits, we would like to explore supporting the conversion of vApp to a set of containers. vApps are a logical set of Virtual Machines that work together to support a specific applications goals. This would likely map to a set of containers, where each container corresponds to a a given virtual machine. Just as the VMs are linked together through perhaps shared volumes and network communication, the containers' could be orchestrated to function in an analogous manner.
 
+Other, more open-ended extensions to this project that can be explored involve harnessing the layering and package management that has been created in the resulting converted Docker containers. These highly layered, modular, containers might be used to create a Docker orchestration tool, or build on top of an existing one, that is aware of the layers of a set of Docker containers and deploys them in such a way to minimize the total storage usage and maximize the proximity of those containers that have the most layers in common.
+
+Another interesting direction involves the categorization of packages based on those that are heavy in disk, network, or processor, for example. The goal would be to maximize performance by deploying containers on hosts such that those that are running apps that are potentially very hungry for a certain resource are not deployed on the same host as others that are hungry for the same one. This pre-emptive scheduling based on the installed packages on a container could be combined with a more dynamic form of deployment that monitors the resource usage in realtime. However, without live migration, containers would need to be stopped and then started again to take advantage of this feature.
 
 \begin{thebibliography}{99}
 
@@ -324,6 +334,9 @@ M. G. Xavier, M. V. Neves, F. D. Rossi, T. C. Ferreto, T. Lange, and C. A. F. De
 
 \bibitem{vmotion}
 ``VMware vMotion: Virtual Machine Live Migration," [Online]. Available: \href{http://www.vmware.com/products/vsphere/features/vmotion}{http://www.vmware.com/products/vsphere/features/vmotion}
+
+\bibitem{DRS}
+``vSphere Dynamic Resource Scheduler & Distributed Power Management," [Online]. Available: \href{http://www.vmware.com/products/vsphere/features/drs-dpm}{http://www.vmware.com/products/vsphere/features/drs-dpm}
 
 \bibitem{CRIU}
 ``CRIU," 2014. [Online]. Available: \href{http://criu.org/}{http://criu.org/}
