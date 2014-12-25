@@ -5,12 +5,45 @@
 %% \files=
 %% prompt when you run the file main.tex through LaTeX.
 \chapter{Conclusion}
-\section{Discussion}
+\label{chap:conclusion}
+In this chapter, we wrap up by discussing VM2Docker's overall contribution to the field. We then discuss future enhancements and additions to our work.
+
+\section{Contribution}
+This thesis presents a novel area of research in an otherwise extremely popular and burgeoning research area and industry: container technology. With very few existing tools out to convert a given virtual machine to a layered Docker container, we argue that VM2Docker is unique and unprecedented in its approach. 
+
+Our design decision of separating the logic of the host initiating the conversion, the chief, and those being converted, the agents, represents an effective and successful approach to the challenges outlined in the original proposal. The manner in which the chief achieves platform independence by executing the conversion within a Docker container is an innovative use of the very technology we wish to extend.
+
+The evaluation of our system reveals promising quantitative and qualitative results for VM2Docker. We tested VM2Docker on various releases of three major Linux operating systems: Ubuntu, CentOS, and Mageia. We executed both tests that had a single virtual machine as input, as well as those that had many virtual machines. The single VM tests showed the breakdown of sizes for each of the four layers $DI_0$ - $DI_3$ for all OSs and releases provided as input. Generally, we saw a overall decrease in the marginal cost of VM deployment $DI_3$, as the number of layers increased. Overall space savings were always realized after the second VM ($\Xi = 2$). In the multi VM tests, we analyzed the behavior and effectiveness of VM2Docker under five scenarios and found expected behavior and space savings, as predicted by the single VM experiments. In terms of OS compatibility, each was capable of being supported by VM2Docker with the definition of only 4 simple commands that are specific to the OS's package management tool. We believe this is a very minimal and acceptable set-up cost needed to achieve all of the layering benefits of VM2Docker conversion process and the subsequent deployment optimizations and space improvements.
+
 \section{Future Work}
 \label{sec:future}
+Despite the successes of VM2Docker, there are a number of avenues of further research that could greatly enhance the overall conversion process.
+
 \subsection{Multi-Container Orchestration}
-\subsection{Diff Alternatives}
-%https://github.com/loyso/Scarab
+In its current form, VM2Docker only handles the conversion from one virtual machine to one Docker container. However, this approach may be fundamentally flawed because Docker containers are generally centered around running a single application, while virtual machines obviously have the ability to run multiple applications at once. While containers can support as many processes and applications as needed, the generally accepted design pattern has been to separate each application into its own container and link the two containers in some way depending on their level of interaction. This would then require a container orchestration tool to handle the configuration of these links. 
+
+Before this thesis was started, there existed only third-party orchestration tools each with their own benefits and drawbacks. Since then, Docker has announced their own native tool, called Docker Compose, which provides a simple way of creating a single configuration file with the desired parameters that link up two or more containers ~\cite{dockercompose}.
+
+In the future, the ability to map a single VM to multiple containers orchestrated through Docker Compose would be an invaluable addition to the VM2Docker framework. Furthermore, each of these containers would share all or most of the same layers in the filesystem, thereby taking up very little additional space.
+
 \subsection{Socket Security}
-There currently isn't a wink
-\subsection{Docker Compose}
+The security of VM2Docker was completely disregarded in the generation of this prototype. When the agent is run on a host, a socket is opened up for listening. Any malicious user with access to the host's IP address may connect to this socket and arbitrarily execute any of the given remote procedure calls, thereby having full read access to the host's filesystem. In the future, a key-based solution should be used to only allow connections from trusted sources. Specifically, before building the executable agent, it could potentially be signed by the chief. This would ensure that subsequent connections would only be allowed by the host that signed the executable.
+
+\subsection{Diff Alternatives}
+For simplicity, we focused on using \texttt{rsync} as the primary means of generating a filesystem diff. We also briefly touched upon \texttt{rdiffdir} because of its ability to incorporate block-level, instead of file-level changes, into the corresponding delta file.
+
+Both \texttt{rsync} and \texttt{rdiffdir} would be less successful in the case of a large file that has been moved from one location to another. In this case, each would detect a deletion, followed by a subsequent addition of a seemingly unrelated file. One way of solving this issue is to incorporate a hash-based approach to determine any such files that have been moved but are otherwise unchanged. Likely, this algorithm on its own would be prohibitively costly in terms of the time it takes to run. Instead a hybrid \texttt{rsync} and hash-based approach could be used and the file size threshold at which a given file's hash is calculated could be tuned accordingly.
+
+An alternative diff algorithm that might be of interest as well is Scarab \cite{scarab}. Scarab is C++ library used to patch binary content files and would therefore not suffer the same dependency issues as those with from \texttt{rdiffdir} and python.
+
+\subsection{More Optimal Layering}
+A final open-ended area of research concerns the layering algorithm used by VM2Docker. While the results in chapter~\ref{chap:eval} were as a whole fairly successful and promising, the overall size of $DI_3$ for many images suggests that there is still room for improvement.
+
+Specifically, one way of improving the overall layering process is by modifying the package management logic to incorporate a dynamic number of layers, instead of being fixed to two. Currently, the first layer, $DI_1$, is always the intersection of the packages for all VMs of the given OS and release. Thus, as shown in Scenario E of section~\ref{sec:multivm}, there are examples where VM2Docker would greatly improve the overall space usage and the efficiency of the layering by recursively applying the package intersection algorithm across multiple iterations. In scenario E, this occurred with as few as three input VMs, where the intersection of packages among the three were small but the remaining two VMs had a significant number of remaining packages in common (all but one) that VM2Docker did not detect. Intuitively, these commonalities are more and more likely as the number of input VMs increases. As a result, an algorithm, either greedy or brute-force, might be generated to determine the optimal order of packages intersections across various input virtual machines across many layers.
+
+Another important observation from these evaluation results was that the package reinstallation process was never every to perfectly reinstall packages. Although, as a whole, each intermediate layer served to reduce the marginal cost of an additional VM deployment, ($\chi > 0$), this sometimes came at the cost of increases in the total size of all the layers, as compared to the original VM. While this cost was always offset after the second instance of a given VM ($\Xi = 2$), further research could be done to determine if there is a more optimal way of package reinstallation that minimizes this tradeoff. 
+
+Overall, however, we are satisfied with the package installation process as a whole. In addition to providing layering between common components of different VMs, each of our Docker images retain the qualitative feature of being generated from a basic and readable sequence of commands laid out in the Dockerfile. This transparency allows for any third-party user to verify the authenticity and safety of a given Docker image before building, as is the motivation behind Docker's ``trusted builds" \cite{trustedbuilds}.
+
+
+

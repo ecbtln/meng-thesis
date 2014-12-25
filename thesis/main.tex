@@ -31,6 +31,10 @@
 %% some PDF conversions mess up the ligatures.  -LB, 1/22/2014
 \usepackage{cmap}
 \usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{subfigure}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
 \pagestyle{plain}
@@ -39,9 +43,9 @@
 %% process, or `all' to process all files which you \include.
 %% Krishna Sethuraman (1990).
 
-\def\files{cover,contents,chap1,chap2,chap3,chap4,chap5,chap6,biblio}
-\def\all{all}
-\includeonly{\files} 
+%\def\files{cover,contents,chap1,chap2,chap3,chap4,chap5,chap6,biblio}
+%\def\all{all}
+%\includeonly{\files} 
 
 \begin{document}
 
@@ -58,9 +62,9 @@
 \include{chap4}
 \include{chap5}
 \include{chap6}
-\appendix
-\include{appa}
-\include{appb}
+%\appendix
+%\include{appa}
+%\include{appb}
 \include{biblio}
 \end{document}
 
