@@ -130,9 +130,9 @@ In the results, the layering tradeoff is very minimal while making use of only f
     \hline
 & \multicolumn{3}{|c|}{\bfseries CentOS Minimal} \\ \hline
     \bfseries Release & \itshape 5* & \itshape 6 & \itshape 7 \\ \hline
-    \bfseries Bare VM & 2441.5 &  573.7 & 779.4\\ \hline
+    \bfseries Bare VM & 2441.5 &  618.2 & 779.4\\ \hline
     \bfseries Base Image ($DI_0$) & 496.0 & 236.1 & 243.1\\ \hline
-    \bfseries rsync & 2190.0 & 478.1 & 601.8\\ \hline 
+    \bfseries rsync & 2190.0 & 450.1 & 601.8\\ \hline 
     \bfseries rdiff & 2138.7 & 416.7 & 519.4\\ \hline
 \bfseries $\Xi$ & 2 & 2 & 2 \\ \hline
     \end{tabular}
@@ -189,12 +189,12 @@ This point of comparison is used to quantify the marginal cost of deploying an a
     \hline
 & \multicolumn{2}{|c|}{\bfseries CentOS} & \multicolumn{1}{|c|}{\bfseries Mageia} \\ \hline
     \bfseries Release & \itshape 6 & \itshape 7 & \itshape 3 \\ \hline
-    \bfseries Bare VM & 573.7 & 779.4 & 636.1\\ \hline
+    \bfseries Bare VM & 618.2 & 779.4 & 636.1\\ \hline
     \bfseries $DI_0$ & 236.1 & 243.1 & 160.4  \\ \hline
-    \bfseries $DI_1$ & 286.5 & 417.1 & 544.2 \\ \hline
-    \bfseries $DI_3$ & 381.9 & 339.9 & 465.9 \\ \hline
-\bfseries $\chi$ & 33.4 & 56.5 & 26.8 \\ \hline
-     \bfseries $\Phi_3$ & 904.5 & 1000.1 & 1170.5 \\ \hline
+    \bfseries $DI_1$ & 244.0 & 417.1 & 544.2 \\ \hline
+    \bfseries $DI_3$ & 380.5 & 339.9 & 465.9 \\ \hline
+\bfseries $\chi$ & 38.5 & 56.5 & 26.8 \\ \hline
+     \bfseries $\Phi_3$ & 860.6 & 1000.1 & 1170.5 \\ \hline
      \bfseries $\Xi$ & 2 & 2 & 2 \\ \hline
     \end{tabular}
 \caption{The results of running VM2Docker with a single VM input and various releases of CentOS and Mageia. As the overall layering increases, the size of $DI_3$ decreases, which results in a increasing \% overall reduction, $\chi$ in the marginal cost of deploying a given VM. For all inputs, $\Xi = 2$ and therefore space savings begin to occur on the second instance of a given OS release.}
@@ -213,12 +213,13 @@ We therefore seek to analyze various combinations of VM inputs of a given OS and
 
 It is very hard to describe what might be an "average" looking input to this system because one could use a virtual machine to do a wide range of computing. Nonetheless, there are many real-world practical use cases where VM2Docker might be particularly effective. The class of VMs that are used as servers in a simple client-server interaction are one example of such inputs. A given VM might be running a webserver, database, mail server, or other server-based daemon and might represent one such input to the VM2Docker system. 
 
-We have designed a total of five experiments with various characteristics and combinations of input VMs in order to highlight strengths and weaknesses of the overall algorithm and framework. For each scenario, we begin by describing how we expect VM2Docker to handle these inputs in terms of the expected size of the outputs. These experiment descriptions will be OS-agnostic. We next present the results of running this experiment for specific releases of multiple OS's (Ubuntu, CentOS, and Mageia). Finally, we discuss any findings that might be unexpected or out of the ordinary.
+We have designed a total of five experiments with various characteristics and combinations of input VMs in order to highlight strengths and weaknesses of the overall algorithm and framework. For each scenario, we begin by describing how we expect VM2Docker to handle these inputs in terms of the expected size of the outputs. These experiment descriptions will be OS-agnostic. We next present the results of running this experiment for specific releases of multiple OS's (Ubuntu, CentOS, and Mageia). 
+%Finally, we discuss any findings that might be unexpected or out of the ordinary.
 
 \begin{enumerate}
 \item \underline{Scenario A}\\
 \textit{Input}:\\
-$\boldsymbol{VM_1}$: Minimal OS, $\sim$ 1GB \textemdash\ $\boldsymbol{VM_2}$: OS Complete Install, $\sim$ 3GB\\
+$\boldsymbol{VM_1}$: Minimal OS, $\sim$ 1GB \textemdash\ $\boldsymbol{VM_2}$: OS Complete Install, $\sim$ 2-3GB\\
 
 The difference between these two VMs is additional packages and repositories that are provided in the complete install. The second VM will contains all of the packages on the first VM, as well as a few gigabytes of additional software.
 
@@ -237,11 +238,13 @@ With two VMs provided as input, they will each share the same base image $DI_0$ 
     \begin{tabular}{| c | c | c | c|}
     \hline
     \bfseries Release & \itshape Ubuntu 13.10 & \itshape CentOS 6 & \itshape Mageia 3\\ \hline
-    \bfseries $\boldsymbol{DI_1}$ & 273.7 & 226 & 248\\ \hline
-    \bfseries $\boldsymbol{DI_2^1}$ & 0 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_2^2}$ & ?? & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^1}$  & 733.7 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^2}$ & ?? & 129 & 147\\ \hline 
+\bfseries $\boldsymbol{VM_1}$ & 1055.2 & 618.2 & 636.1\\ \hline
+\bfseries $\boldsymbol{VM_2}$ & 3232.4 & 2051.1 & 1669.4\\ \hline \hline
+    \bfseries $\boldsymbol{DI_1}$ & 273.7 & 244.0 & 544.2\\ \hline
+    \bfseries $\boldsymbol{DI_2^1}$ & 0 & 0 & 0\\ \hline 
+\bfseries $\boldsymbol{DI_2^2}$ & 2092.1 & 490.8 & 898.1\\ \hline 
+\bfseries $\boldsymbol{DI_3^1}$  & 733.7 & 380.5 & 465.9\\ \hline 
+\bfseries $\boldsymbol{DI_3^2}$ & 1646.1 & 1541.9 & 1225.3\\ \hline 
     \end{tabular}
 \caption{The results of running the multi VM scenario A with M=1. All values are in MB.}
 \label{table:multiscenarioa}
@@ -251,8 +254,7 @@ With two VMs provided as input, they will each share the same base image $DI_0$ 
 
 \item \underline{Scenario B}\\
 \textit{Input}:\\
-$VM_1$: CentOS6 Minimal, 676 MB\\
-$VM_2$: CentOS6 Minimal plus 300 MB of additional files scattered across the OS, 1000 MB\\
+$\boldsymbol{VM_1}$: Minimal OS, $\sim$ 1GB \textemdash\ $\boldsymbol{VM_2}$: Minimal OS + 300MB additional files, $\sim$ 1GB\\
 
 \textit{Expected Output}:
 
@@ -262,7 +264,7 @@ $VM_2$: CentOS6 Minimal plus 300 MB of additional files scattered across the OS,
 %$DC_3^1$: 157.1MB\\
 %$DC_3^2$: 457MB\\
 
-The only differences between these two VMs comes in the addition of 300MB of files that can't be categorized into packages. This will result in an increase in $DI_3$ of the size of the additional files that were added to the VM.
+The only differences between these two VMs comes in the addition of 300MB of files that can't be categorized into packages. This will result in an increase in $DI_3^2$ of the size of the additional files that were added to the VM. All other values should be the same as those in the single VM experiments.
 
 \begin{table}[h]
 \centering
@@ -270,11 +272,13 @@ The only differences between these two VMs comes in the addition of 300MB of fil
     \begin{tabular}{| c | c | c | c|}
     \hline
     \bfseries Release & \itshape Ubuntu 13.10 & \itshape CentOS 6 & \itshape Mageia 3\\ \hline
-    \bfseries $\boldsymbol{DI_1}$ & 205 & 226 & 248\\ \hline
-    \bfseries $\boldsymbol{DI_2^1}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_2^2}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^1}$  & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^2}$ & 67 & 129 & 147\\ \hline 
+\bfseries $\boldsymbol{VM_1}$ & 1055.2 & 618.2 & 636.1\\ \hline
+\bfseries $\boldsymbol{VM_2}$ & 1355.2 & 918.2 & 936.1\\ \hline \hline
+    \bfseries $\boldsymbol{DI_1}$ & 273.7 & 244.0 & 544.2\\ \hline
+    \bfseries $\boldsymbol{DI_2^1}$ & 0 & 0 & 0\\ \hline 
+\bfseries $\boldsymbol{DI_2^2}$ & 0 & 0 & 0\\ \hline 
+\bfseries $\boldsymbol{DI_3^1}$  & 733.7 & 380.5 & 465.9\\ \hline 
+\bfseries $\boldsymbol{DI_3^2}$ & 1033.7 & 680.5 & 765.9\\ \hline 
     \end{tabular}
 \caption{The results of running the multi VM scenario B with M=1. All values are in MB.}
 \label{table:multiscenariob}
@@ -283,10 +287,7 @@ The only differences between these two VMs comes in the addition of 300MB of fil
 
 \item \underline{Scenario C}\\
 \textit{Input}:\\
-
-$VM_1$: CentOS6 Minimal, 676 MB\\
-$VM_2$: CentOS6 Minimal plus 300 MB of additional files scattered across the OS, 1000 MB\\
-$VM_3$: CentOS6 Complete, 2.8 GB\\
+$\boldsymbol{VM_1}$: Minimal OS, $\sim$ 1GB \textemdash\ $\boldsymbol{VM_2}$: Minimal OS + 300MB additional files, $\sim$ 1GB \textemdash $\boldsymbol{VM_3}$: OS Complete Install, $\sim$ 2-3GB\\
 
 \textit{Expected Output}:
 
@@ -298,20 +299,23 @@ $VM_3$: CentOS6 Complete, 2.8 GB\\
 %$DC_3^2$: 457MB\\
 %$DC_3^3$: 300-500MB\\
 
-These results should be a combination of the two previous 2VM experiments, with the sizes remaining the same as if the experiments were run separately.
+These results should be a combination of the two previous two experiments, with the sizes remaining the same as if the experiments were run separately. 
 \begin{table}[h]
 \centering
 
     \begin{tabular}{| c | c | c | c|}
     \hline
     \bfseries Release & \itshape Ubuntu 13.10 & \itshape CentOS 6 & \itshape Mageia 3\\ \hline
-    \bfseries $\boldsymbol{DI_1}$ & 205 & 226 & 248\\ \hline
-    \bfseries $\boldsymbol{DI_2^1}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_2^2}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_2^3}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^1}$  & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^2}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^3}$ & 67 & 129 & 147\\ \hline 
+\bfseries $\boldsymbol{VM_1}$ & 1055.2 & 618.2 & 636.1\\ \hline
+\bfseries $\boldsymbol{VM_2}$ & 1355.2 & 918.2 & 936.1\\ \hline
+\bfseries $\boldsymbol{VM_3}$ & 3232.4 & 2051.1 & 1669.4\\ \hline \hline
+    \bfseries $\boldsymbol{DI_1}$ & 273.7 & 244.0 & 544.2\\ \hline
+    \bfseries $\boldsymbol{DI_2^1}$ & 0 & 0 & 0\\ \hline 
+\bfseries $\boldsymbol{DI_2^2}$ & 0 & 0 & 0\\ \hline 
+\bfseries $\boldsymbol{DI_2^3}$ & 2092.1 & 490.8 & 898.1\\ \hline 
+\bfseries $\boldsymbol{DI_3^1}$  & 733.7 & 380.5 & 465.9\\ \hline 
+\bfseries $\boldsymbol{DI_3^2}$ & 1033.7 & 680.5 & 765.9\\ \hline 
+\bfseries $\boldsymbol{DI_3^3}$ & 1646.1 & 1541.9 & 1225.3\\ \hline 
     \end{tabular}
 \caption{The results of running the multi VM scenario C with M=1. All values are in MB.}
 \label{table:multiscenarioc}
@@ -320,10 +324,11 @@ These results should be a combination of the two previous 2VM experiments, with 
 
 \item \underline{Scenario D}\\
 \textit{Input}:\\
+$\boldsymbol{VM_1}$: Minimal OS, $\sim$ 1GB \textemdash\ $\boldsymbol{VM_2}$: OS Complete Install + 300MB additional files, $\sim$ 2-3GB \textemdash $\boldsymbol{VM_3}$: OS Complete Install, $\sim$ 2-3GB\\
 
-$VM_1$: CentOS6 Minimal, 676 MB\\
-$VM_2$: CentOS6 Complete plus 300 MB of additional files scattered across the OS, 3.1GB\\
-$VM_3$: CentOS6 Complete, 2.8 GB\\
+%$VM_1$: CentOS6 Minimal, 676 MB\\
+%$VM_2$: CentOS6 Complete plus 300 MB of additional files scattered across the OS, 3.1GB\\
+%$VM_3$: CentOS6 Complete, 2.8 GB\\
 
 \textit{Expected Output}:
 
@@ -335,7 +340,7 @@ $VM_3$: CentOS6 Complete, 2.8 GB\\
 %$DC_3^2$: 600-800MB\\
 %$DC_3^3$: 300-500MB\\
 
-These results should be similar in practice to the previous experiment as well. An interesting feature of VM2Docker will be exposed here as well. Since $DI_2^2$ and $DI_2^3$ are the same, they will be only represented once on disk by the same image. This is thanks to an implicit feature of Docker. Since VM2Docker generates Dockerfiles, which are instructions to generate the image, the Dockerfiles for $DI_2^2$ and $DI_2^3$ will be the same (the commands are the same and they are installing the same packages). VM2Docker sorts the list of packages being installed to ensure that the command in the Dockerfile is the same on subsequent runs. 
+These results should be similar in practice to the previous experiment as well. An interesting feature of VM2Docker will be exposed here as well. Since $DI_2^2$ and $DI_2^3$ are the same, they will be only represented once on disk by the same image. This is thanks to an implicit feature of Docker. Since VM2Docker generates Dockerfiles, which are instructions to generate the image, the Dockerfiles for $DI_2^2$ and $DI_2^3$ will be the same (the commands are the same and they are installing the same packages). VM2Docker sorts the list of packages being installed alphabetically to ensure that the command in the Dockerfile is the same on subsequent runs. 
 
 \begin{table}[h]
 \centering
@@ -343,13 +348,16 @@ These results should be similar in practice to the previous experiment as well. 
     \begin{tabular}{| c | c | c | c|}
     \hline
     \bfseries Release & \itshape Ubuntu 13.10 & \itshape CentOS 6 & \itshape Mageia 3\\ \hline
-    \bfseries $\boldsymbol{DI_1}$ & 205 & 226 & 248\\ \hline
-    \bfseries $\boldsymbol{DI_2^1}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_2^2}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_2^3}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^1}$  & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^2}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^3}$ & 67 & 129 & 147\\ \hline 
+\bfseries $\boldsymbol{VM_1}$ & 1055.2 & 618.2 & 636.1\\ \hline
+\bfseries $\boldsymbol{VM_2}$ & 3532.4 & 2351.1 & 1969.4\\ \hline
+\bfseries $\boldsymbol{VM_3}$ &  3232.4 & 2051.1 & 1669.4\\ \hline \hline
+    \bfseries $\boldsymbol{DI_1}$ & 273.7 & 244.0 & 544.1\\ \hline
+    \bfseries $\boldsymbol{DI_2^1}$ & 0 & 0 & 0\\ \hline 
+\bfseries $\boldsymbol{DI_2^2}$ & 2092.1 & 490.8 & 898.1\\ \hline 
+\bfseries $\boldsymbol{DI_2^3}$ & 2092.1 & 490.8 & 898.1\\ \hline 
+\bfseries $\boldsymbol{DI_3^1}$  & 733.7 & 380.5 & 465.9\\ \hline 
+\bfseries $\boldsymbol{DI_3^2}$ & 1946.1 & 1841.9 & 1525.3\\ \hline 
+\bfseries $\boldsymbol{DI_3^3}$ & 1646.1 & 1541.9 & 1225.3\\ \hline 
     \end{tabular}
 \caption{The results of running the multi VM scenario D with M=1. All values are in MB.}
 \label{table:multiscenariod}
@@ -357,10 +365,11 @@ These results should be similar in practice to the previous experiment as well. 
 
 \item \underline{Scenario E}\\
 \textit{Input}:\\
+$\boldsymbol{VM_1}$: Minimal OS, $\sim$ 1GB \textemdash\ $\boldsymbol{VM_2}$: OS Complete Install, $\sim$ 2-3GB \textemdash $\boldsymbol{VM_3}$: OS Complete Install + Ruby, $\sim$ 2-3GB\\
 
-$VM_1$: CentOS6 Minimal, 676 MB\\
-$VM_2$: CentOS6 Complete, 2.8 GB\\
-$VM_3$: CentOS6 Complete plus 1 more package of negligible size, 2.8 GB\\
+%$VM_1$: CentOS6 Minimal, 676 MB\\
+%$VM_2$: CentOS6 Complete, 2.8 GB\\
+%$VM_3$: CentOS6 Complete plus 1 more package of negligible size, 2.8 GB\\
 
 \textit{Expected Output}:
 
@@ -372,20 +381,23 @@ $VM_3$: CentOS6 Complete plus 1 more package of negligible size, 2.8 GB\\
 %$DI_3^2$: 600-800MB\\
 %$DI_3^3$: 300-500MB\\
 
-These results will be the same as in the previous experiment, except that $DI_2^2$ and $DI_2^3$ will no longer occupy the same space on disk and will be two distinct images. This reveals a shortcoming of VM2Docker in its inability to execute multiple rounds of finding packages in common between multiple VMs. This will be addressed further in the discussion.
+These results will be the same as in the previous experiment, except that $DI_2^2$ and $DI_2^3$ will no longer occupy the same space on disk and will be two distinct images. The Ruby package itself is no more than 10-20MB, the end result will be more than 2GB additional space used on disk. This reveals a shortcoming of VM2Docker in its inability to execute multiple rounds of finding packages in common between multiple VMs. This will be addressed further in the discussion and future work section.
 \begin{table}[h]
 \centering
 
     \begin{tabular}{| c | c | c | c|}
     \hline
     \bfseries Release & \itshape Ubuntu 13.10 & \itshape CentOS 6 & \itshape Mageia 3\\ \hline
-    \bfseries $\boldsymbol{DI_1}$ & 205 & 226 & 248\\ \hline
-    \bfseries $\boldsymbol{DI_2^1}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_2^2}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_2^3}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^1}$  & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^2}$ & 67 & 129 & 147\\ \hline 
-\bfseries $\boldsymbol{DI_3^3}$ & 67 & 129 & 147\\ \hline 
+\bfseries $\boldsymbol{VM_1}$ & 1055.2 & 618.2 & 636.1\\ \hline
+\bfseries $\boldsymbol{VM_2}$ & 3232.4 & 2051.1 & 1669.4\\ \hline
+\bfseries $\boldsymbol{VM_3}$ &  3245.4 & 2063.8 & 1680.2\\ \hline \hline
+    \bfseries $\boldsymbol{DI_1}$ & 273.7 & 244.0 & 544.2\\ \hline
+    \bfseries $\boldsymbol{DI_2^1}$ & 0 & 0 & ??\\ \hline 
+\bfseries $\boldsymbol{DI_2^2}$ & 2092.1 & 490.8 & 898.1\\ \hline 
+\bfseries $\boldsymbol{DI_2^3}$ & 2104.9 & 502.1 & 909.3\\ \hline 
+\bfseries $\boldsymbol{DI_3^1}$  & 733.7 & 380.5 & 465.9\\ \hline 
+\bfseries $\boldsymbol{DI_3^2}$ & 1646.1 & 1541.9 & 1225.3\\ \hline 
+\bfseries $\boldsymbol{DI_3^3}$ & 1647.3 & 1542.3 & 1225.8\\ \hline 
     \end{tabular}
 \caption{The results of running the multi VM scenario E with M=1. All values are in MB.}
 \label{table:multiscenarioe}
@@ -393,6 +405,8 @@ These results will be the same as in the previous experiment, except that $DI_2^
 
 \end{enumerate}
 
+
+Overall, VM2Docker performs as expected when combining the single VM experiments with various combinations of VMs from the same OS and release. Of interest is the ability with which each of the given operating system's reinstallation process effectively reduces the size of $DI_3$. Relative to the size of the original VM, it seems as if CentOS 6 had the smallest $DI_2$ layer, while still being able to reduce the size of $DI_3$ relative to the original VM. Furthermore, Ubuntu 13.10 seems to have the largest reduction from original VM size to $DI_3$, but $DI_2$ is also the largest for this OS, so it comes at a fixed cost. Of course, this fixed cost is made up for after the second VM, as is the case in scenario D. Thus, as a whole we argue that these experimental results support the argument that the introduction of automatic layering by base image, packages, and filesystem diff by VM2Docker serves to reduce the overall space used by the containers as compared to the original VMs, as long as $\Xi \ge 2$. 
 
 
 

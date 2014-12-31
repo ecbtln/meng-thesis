@@ -6,9 +6,9 @@
 %% prompt when you run the file main.tex through LaTeX.
 \chapter{Introduction}
 
-Containers are a lightweight alternative to virtual machines that have been getting a lot of hype in the cloud-computing environment in recent months. Instead of being fully isolated from the host, containers tradeoff this isolation and share a kernel with the host and all other containers running on the same system in favor of higher density and performance. Within this context, Docker is one of the most prominent open-source container solutions In this thesis, we introduce, describe the design and implementation and evaluate the VM2Docker system, which automates the conversion from virtual machine to Docker container
+Containers are a lightweight alternative to virtual machines that have been getting a lot of hype in the cloud-computing environment in recent months. Instead of being fully isolated from the host, containers tradeoff this isolation and share a kernel with the host and all other containers running on the same system in favor of higher density and performance. Within this context, Docker is one of the most prominent open-source container solutions. In this thesis, we introduce, describe the design and implementation of, and evaluate the VM2Docker system, which automates the conversion from virtual machine to Docker container
 
-Chapter~\ref{chap:docker} describes the fundamentals of the Docker framework and introduces the layered filesystem it provides. It also provides a brief comparison to virtual machines as presents a discussion of the benefits and drawbacks of each.
+Chapter~\ref{chap:docker} describes the fundamentals of the Docker framework and introduces the layered filesystem. It also provides a brief comparison to virtual machines and presents a discussion of the benefits and drawbacks of each.
 
 Chapter~\ref{chap:relatedwork} describes any related work as it pertains to the conversion from an arbitrary virtual machine to a container format.
 
@@ -16,4 +16,4 @@ Chapter~\ref{chap:vm2docker} presents an overview of the VM2Docker framework. It
 
 Chapter~\ref{chap:eval} evaluates the effectiveness and overall utility of the VM2Docker framework. The discussion focuses on the conversion process itself, both from a qualitative and quantitative perspective. The disk usage of the various layers of the filesystem is the primary means by which the use of VM2Docker provides a clear advantage over running many copies of many virtual machines running the same release of a given operating system, as long as these virtual machines are those that are capable of being run within a container.
 
-Finally, chapter~\ref{chap:conclusion} presents an overall summary of the benefits and drawbacks of VM2Docker and its contribution to the field. Possible future improvements and additional features to the project are also discussed.
+Finally, chapter~\ref{chap:conclusion} presents an overall summary of the benefits and drawbacks of VM2Docker and its contribution to the field. Possible future improvements and additional features of the project are also discussed.
