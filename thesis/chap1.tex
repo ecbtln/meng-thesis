@@ -10,10 +10,10 @@ Containers are a lightweight alternative to virtual machines that have been gett
 
 Chapter~\ref{chap:docker} describes the fundamentals of the Docker framework and introduces the layered filesystem. It also provides a brief comparison to virtual machines and presents a discussion of the benefits and drawbacks of each.
 
-Chapter~\ref{chap:relatedwork} describes any related work as it pertains to the conversion from an arbitrary virtual machine to a container format.
+Chapter~\ref{chap:relatedwork} describes any related work as it pertains to the conversion from an arbitrary virtual machine to the container format.
 
 Chapter~\ref{chap:vm2docker} presents an overview of the VM2Docker framework. It breaks down this conversion into the filesystem handling and process detection components. It further describes the automatic layering that VM2Docker hopes to achieve within the filesystem.
 
-Chapter~\ref{chap:eval} evaluates the effectiveness and overall utility of the VM2Docker framework. The discussion focuses on the conversion process itself, both from a qualitative and quantitative perspective. The disk usage of the various layers of the filesystem is the primary means by which the use of VM2Docker provides a clear advantage over running many copies of many virtual machines running the same release of a given operating system, as long as these virtual machines are those that are capable of being run within a container.
+Chapter~\ref{chap:eval} evaluates the effectiveness and overall utility of the VM2Docker framework. The discussion focuses on the conversion process itself, both from a qualitative and quantitative perspective. The disk usage of the various layers of the filesystem is the primary means by which the use of VM2Docker provides a clear advantage over running many copies of many virtual machines running the same release of a given operating system, as long as these virtual machines contain applications that are capable of being run within a container.
 
 Finally, chapter~\ref{chap:conclusion} presents an overall summary of the benefits and drawbacks of VM2Docker and its contribution to the field. Possible future improvements and additional features of the project are also discussed.

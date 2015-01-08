@@ -6,9 +6,9 @@
 %% prompt when you run the file main.tex through LaTeX.
 \chapter{Related Work}
 \label{chap:relatedwork}
-In this chapter, we discuss existing research in the fields relating to both container alternatives and conversion mechanisms. The existing work in this field is fairly limited, and to the extent of our research there is no existing tool that attempts to automate the conversion from VM to container. Everything must be done manually. Nevertheless, there are a few exist tools, as well as terminologies that are important in our overall discussion.
+In this chapter, we discuss existing research in the fields relating to both container alternatives and conversion mechanisms. The existing work in this field is fairly limited, and to the extent of our research there is no existing tool that attempts to automate the conversion from VM to container. Everything must be done manually. Nevertheless, there are a few tools, as well as terminologies that are important in our overall discussion.
 
-In sections~\ref{sec:dockerimport} and~\ref{sec:dockercommit}, we introduce two tools built into the Docker engine and describe why they are insufficient for the VM conversion process. Then, in section~\ref{sec:dockerize} we describe the term "dockerization" and how it is currently used in the industry. In section~\ref{sec:pvc} we mention Parallels Virtuozzo Containers and their connection to Docker. Finally, in section~\ref{sec:dtovm} we describe the alternative conversion, from Docker to Virtual Machine.
+In sections~\ref{sec:dockerimport} and~\ref{sec:dockercommit}, we introduce two tools built into the Docker engine and describe why they are insufficient for the VM conversion process. Then, in section~\ref{sec:dockerize} we describe the term "dockerization" and how it is currently used in practice. In section~\ref{sec:pvc} we mention Parallels Virtuozzo Containers and their connection to Docker. Finally, in section~\ref{sec:dtovm} we describe the alternative conversion, from Docker to Virtual Machine.
 
 \section{Docker import}
 \label{sec:dockerimport}
@@ -20,7 +20,7 @@ Included with Docker is the import tool that has the following documentation:\\
 
 Theoretically, this tool would permit us to create a tarball out of a full-fledged virtual machine and import it directly into Docker. However, doing so would completely abandon the notion of layering different filesystems together to construct an image, and the final Docker image would take up the same space as the original virtual machine. Furthermore, if multiple virtual machines were converted in this manner, even if they had the same underlying OS and distribution, their layers wouldn't share any of the same lineage. Thus, two docker images would take up the same amount of space as the original two VMs. 
 
-As a result, Docker recommends that this tool be used only to create base images. Base images should be made as small as possible and intuitively should only contain the necessary files to provide a fully-functioning OS. Packages can subsequently be installed on top of the base image depending on the desired function of the container. 
+As a result, Docker recommends that this tool be used only to create base images. Base images should be made as small as possible and intuitively only contain the necessary files to provide a fully-functioning OS. Packages can subsequently be installed on top of the base image depending on the desired function of the container. 
 
 \section{Docker commit}
 \label{sec:dockercommit}
@@ -38,13 +38,13 @@ Dockerization is the process of converting an application to be capable of being
 
 Of particular importance is the distinction between making use of \texttt{docker commit}, as mentioned in section~\ref{sec:dockercommit}, as compared to creating a Docker image that is built purely from a set of instructions in a Dockerfile. Docker commit is not accepted as a valid Dockerization tool because it masks the exact changes made to the filesystem layer and generally results in Docker images that take up more space than if one were to build the same image from a set of instructions. 
 
-In fact, Docker has recently started labeling "trusted builds" as those in the registry for which there is a complete set of instructions of how they are built in a publicly accessible GitHub repository. The builds are "trusted" in the sense that the complete set of instructions of how each image is built is observable by all potential users. 
+In fact, Docker has recently started labeling "trusted builds" as those in the registry for which there is a Dockerfile containing instructions of how they are built in a publicly accessible GitHub repository. The builds are "trusted" in the sense that the complete set of instructions of how each image is built is observable by all potential users. Thus, no trusted builds are created with the \texttt{commit} tool.
 
-Thus, VM2Docker aims to streamline the Dockerization process by offering the automatic and large-scale conversion of VMs to their corresponding Docker containers. We specifically focus on the filesystem layering process for evaluation and we do not make use of the ~\texttt{docker commit} tool in favor of greater transparency of the set of instructions used to build each image.
+Thus, VM2Docker aims to streamline the Dockerization process by offering the automatic and large-scale conversion of VMs to their corresponding Docker containers. We specifically focus on the filesystem layering process for evaluation, and we do not make use of the ~\texttt{docker commit} tool in favor of greater transparency of the set of instructions used to build each image.
 
 \section{Parallels Virtuozzo Containers (PVC)}
 \label{sec:pvc}
-Parallels is one of the few existing solutions that provides a seamless conversion from containers to virtual machines, and vice versa. Parallels' container solution is called Virtuozzo Containers and differs largely from Docker. However, the underlying idea of a more lightweight version of a virtual machine still remains. Parallels' \texttt{pmigrate} tool is a command-line utility that provides the seamless conversion between the two types of formats.
+Parallels is one of the few existing solutions that provides a seamless conversion from containers to virtual machines, and vice versa. Parallels' container solution is called Virtuozzo Containers and differs largely from Docker. However, the underlying idea of a more lightweight version of a virtual machine still remains. Parallels' \texttt{pmigrate} tool is a command-line utility that provides the seamless conversion between the two types of formats \cite{pvc}.
 
 Interestingly, as of December 15, 2014, Parallels has abandoned their Virtuozzo Container format in favor of the Docker container format for their Cloud Server \cite{pvcloses}.
 
